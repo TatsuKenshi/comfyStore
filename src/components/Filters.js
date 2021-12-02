@@ -95,9 +95,7 @@ const Filters = () => {
                       onClick={updateFilters}
                       data-color="all"
                       className={`${
-                        color.toString() === "all"
-                          ? "all-btn active"
-                          : "all-btn"
+                        color === "all" ? "all-btn active" : "all-btn"
                       }`}
                     >
                       all
@@ -111,19 +109,50 @@ const Filters = () => {
                     name="color"
                     style={{ background: c }}
                     className={`${
-                      color.toString() === c ? "color-btn active" : "color-btn"
+                      color === c ? "color-btn active" : "color-btn"
                     }`}
                     data-color={c}
                     onClick={updateFilters}
                   >
-                    {color.toString() === c ? <FaCheck /> : null}
+                    {color === c ? <FaCheck /> : null}
                   </button>
                 );
               })}
             </div>
           </div>
           {/* end of colors */}
+
+          {/* price */}
+          <div className="form-control">
+            <h5>price</h5>
+            <p className="price">{formatPrice(price)}</p>
+            <input
+              type="range"
+              name="price"
+              onChange={updateFilters}
+              min={min_price}
+              max={max_price}
+              value={price}
+            />
+          </div>
+          {/* end of price */}
+
+          {/* shipping */}
+          <div className="form-control shipping">
+            <label htmlFor="shipping"> free shipping</label>
+            <input
+              type="checkbox"
+              name="shipping"
+              id="shipping"
+              onChange={updateFilters}
+              checked={shipping}
+            />
+          </div>
+          {/* shipping */}
         </form>
+        <button type="button" className="clear-btn" onClick={clearFilters}>
+          clear filters
+        </button>
       </div>
     </Wrapper>
   );
