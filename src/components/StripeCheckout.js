@@ -16,7 +16,7 @@ import { useHistory } from "react-router-dom";
 const promise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = () => {
-  const { cart, total_amount, shipping_fee, clear_cart } = useCartContext();
+  const { cart, total_amount, shipping_fee, clearCart } = useCartContext();
   const { myUser } = useUserContext();
   const history = useHistory();
 
@@ -67,11 +67,47 @@ const CheckoutForm = () => {
     // eslint-disable-next-line
   }, []);
 
-  const handleChange = async (event) => {};
-  const handleSubmit = async (ev) => {};
+  const handleChange = async (event) => {
+    setDisabled(event.empty);
+    setError(event.error ? event.error.message : "");
+  };
+  const handleSubmit = async (ev) => {
+    ev.preventDefault();
+    setProcessing(true);
+    const payload = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement),
+      },
+    });
+    if (payload.error) {
+      setError(`Payment failed ${payload.error.message}`);
+      setProcessing(false);
+    } else {
+      setError(null);
+      setProcessing(false);
+      setSucceeded(true);
+      setTimeout(() => {
+        clearCart();
+        history.push("/");
+      }, 10000);
+    }
+  };
 
   return (
     <div>
+      {succeeded ? (
+        <article>
+          <h4>Thank You</h4>
+          <h4>Your Payment Was Successful!</h4>
+          <h4>Redirecting to Home Page Shortly</h4>
+        </article>
+      ) : (
+        <article>
+          <h4>Hello, {myUser && myUser.name}</h4>
+          <p>Your total is {formatPrice(shipping_fee + total_amount)}</p>
+          <p>Test Card Number is 4242 4242 4242 4242</p>
+        </article>
+      )}
       <form id="payment-form" onSubmit={handleSubmit}>
         <CardElement
           id="card-element"
